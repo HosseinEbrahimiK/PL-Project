@@ -7,137 +7,136 @@
          parser-tools/yacc)
 
 (define-datatype command command?
-  (command-unitcom
-   (unitcom-exp unitcom?))
-  (multi-command
+  (command-single
+   (ucmd unitcom?))
+  (command-multi
    (cmd command?)
-   (multi-unitcom unitcom?)))
-
+   (ucmd unitcom?)))
 
 (define-datatype unitcom unitcom?
-  (whilecom-unit
-   (whilecom-exp whilecom?))
-  (ifcom-unit
-   (ifcom-exp ifcom?))
-  (assign-unit
-   (assign-exp assign?))
-  (return-unit
-   (return-exp return?)))
+  (unitcom-while
+   (wcmd whilecom?))
+  (unitcom-if
+   (ifcmd ifcom?))
+  (unitcom-assign
+   (asgn assign?))
+  (unitcom-return
+   (rucmd return?)))
 
 
 (define-datatype whilecom whilecom?
-  (whilecom-ex
+  (while-cmd
    (exper exp?)
    (cmd command?)))
 
 
 (define-datatype ifcom ifcom?
-  (if-exp
+  (if-cmd
    (exper exp?)
    (do-cmd command?)
    (else-cmd command?)))
 
 
 (define-datatype return return?
-  (return-ex
+  (return-cmd
    (return-exp exp?)))
 
 
 (define-datatype assign assign?
-  (assign-ex
+  (assign-cmd
    (var-exp symbol?)
    (exper exp?)))
  
   
 (define-datatype exp exp?
-  (aexp-ex
+  (exp-aexp
    (aexp-exp aexp?))
 
-  (aexp-bigger
+  (exp-bigger
    (aexp1 aexp?)
    (aexp2 aexp?))
 
-   (aexp-smaller
+   (exp-smaller
    (aexp1 aexp?)
    (aexp2 aexp?))
   
-  (aexp-equal
+  (exp-equal
    (aexp1 aexp?)
    (aexp2 aexp?))
 
-  (aexp-notequal
+  (exp-not-equal
    (aexp1 aexp?)
    (aexp2 aexp?)))
 
 
 (define-datatype aexp aexp?
-  (b-exp
+  (aexp-bexp
     (bexpression bexp?))
-  (diff-exp
+  (aexp-minus
     (exp1 bexp?)
     (exp2 aexp?))
-  (plus-exp
+  (aexp-plus
     (exp1 bexp?)
     (exp2 aexp?)))
 
 
 (define-datatype bexp bexp?
-  (c-exp
+  (bexp-cexp
     (cexpression cexp?))
-  (multiply-exp
+  (bexp-mult
     (exp1 cexp?)
     (exp2 bexp?))
-  (divide-exp
+  (bexp-div
     (exp1 cexp?)
     (exp2 bexp?)))
 
 
 (define-datatype cexp cexp?
-  (negative-exp
+  (cexp-comp
     (expr cexp?))
-  (par-exp
+  (cexp-par
     (expr exp?))
-  (num
+  (cexp-num
     (pos-num positive?))
-  (null
+  (cexp-null
     (null-identifier null?))
-  (var-exp
+  (cexp-var
     (var symbol?))
-  (boolean
+  (cexp-bool
     (bool-identifier boolean?))
-  (string
-    (string-identifier string?))
-  (list
-    (list-exp listexp?))
-  (id-listmem
+  (cexp-string
+    (str string?))
+  (cexp-list
+    (list-exp lst?))
+  (cexp-listmem
     (id symbol?)
     (mem listmem?)))
 
 
-(define-datatype listexp listexp?
-  (empty-list
+(define-datatype lst lst?
+  (lst-empty
     (null-list null?))
-  (non-empty-list
-    (list-vals list-values?)))
+  (lst-non-empty
+    (list-vals listvalues?)))
 
 
-(define-datatype list-values list-values?
-  (single-val
+(define-datatype listvalues listvalues?
+  (listvalues-single
     (expr exp?))
-  (multi-val
+  (listvalues-multi
     (expr exp?)
-    (list-val list-values?)))
+    (list-val listvalues?)))
 
 
 (define-datatype listmem listmem?
-  (single-mem
+  (listmem-single
     (expr exp?))
-  (multi-mem
+  (listmem-multi
     (expr exp?)
     (list-mem listmem?)))
 
 
-(define program "a = 0; while a < 1 do a = a - 1 end; return a")
+(define program "a = 3; while a < 1 do a = a - 1 end; return a")
 
 (define simple-math-lexer
            (lexer
@@ -169,7 +168,7 @@
             ("false" (token-false))
             ("null" (token-null))
             ((:: "\"" any-string "\"") (token-string lexeme))
-            ((:+ alphabetic) (token-id lexeme))
+            ((:+ alphabetic) (token-id (string->symbol lexeme)))
             (whitespace (simple-math-lexer input-port))
             ((eof) (token-EOF))))
 
@@ -184,19 +183,19 @@
             (error void)
             (tokens a b)
             (grammar
-             (command ((unitcom) (list 'unitcom $1)) ((command semi unitcom) (list 'multicom $1 $3)))
-             (unitcom ((whilecom) (list 'whilecom $1)) ((ifcom) (list 'ifcom $1)) ((assign) (list 'assigncom $1)) ((return) (list 'returncom $1)))
-             (whilecom ((while exp do command end) (list 'while $2 $4)))
-             (assign ((id asgn exp) (list 'assign $1 $3)))
-             (ifcom ((if exp then command else command endif) (list 'if $2 $4 $6)))
-             (return ((rtn exp) (list 'return $2)))
-             (exp ((aexp) (list 'aexp $1)) ((aexp greater aexp) (list 'more? $1 $3)) ((aexp less aexp) (list 'less? $1 $3)) ((aexp eq aexp) (list 'equal? $1 $3)) ((aexp noteq aexp) (list 'not-equal? $1 $3)))
-             (aexp ((bexp) (list 'bexp $1)) ((bexp min aexp) (list 'minus $1 $3)) ((bexp plus aexp) (list 'plus $1 $3)))
-             (bexp ((cexp) (list 'cexp $1)) ((cexp mult bexp) (list 'mult $1 $3)) ((cexp div bexp) (list 'divide $1 $3)))
-             (cexp ((min cexp) (list 'comp $2)) ((openp exp closep) (list 'par $2)) ((NUM) (list 'number $1)) ((null) (list 'null)) ((id) (list 'var $1)) ((true) (list 'true)) ((false) (list 'false)) ((string) (list 'string $1)) ((lst) (list 'lst '$1)) ((id listmem) (list 'listmem $1 $2)))
-             (lst ((openb listvalues closeb) (list 'listvals $2)) ((openb closeb) (list 'null-list)))
-             (listvalues ((exp) (list 'single-val $1)) ((exp and listvalues) (list 'multival $1 $3)))
-             (listmem ((openb exp closeb) (list 'single-mem $2)) ((openb exp closeb listmem) (list 'multimem $2 $4)))
+             (command ((unitcom) (command-single $1)) ((command semi unitcom) (command-multi $1 $3)))
+             (unitcom ((whilecom) (unitcom-while $1)) ((ifcom) (unitcom-if $1)) ((assign) (unitcom-assign $1)) ((return) (unitcom-return $1)))
+             (whilecom ((while exp do command end) (while-cmd $2 $4)))
+             (assign ((id asgn exp) (assign-cmd $1 $3)))
+             (ifcom ((if exp then command else command endif) (if-cmd $2 $4 $6)))
+             (return ((rtn exp) (return-cmd $2)))
+             (exp ((aexp) (exp-aexp $1)) ((aexp greater aexp) (exp-bigger $1 $3)) ((aexp less aexp) (exp-smaller $1 $3)) ((aexp eq aexp) (exp-equal $1 $3)) ((aexp noteq aexp) (exp-not-equal $1 $3)))
+             (aexp ((bexp) (aexp-bexp $1)) ((bexp min aexp) (aexp-minus $1 $3)) ((bexp plus aexp) (aexp-plus $1 $3)))
+             (bexp ((cexp) (bexp-cexp $1)) ((cexp mult bexp) (bexp-mult $1 $3)) ((cexp div bexp) (bexp-div $1 $3)))
+             (cexp ((min cexp) (cexp-comp $2)) ((openp exp closep) (cexp-par $2)) ((NUM) (cexp-num  $1)) ((null) (cexp-null)) ((id) (cexp-var  $1)) ((true) (cexp-bool #t)) ((false) (cexp-bool #f)) ((string) (cexp-string $1)) ((lst) (cexp-list $1)) ((id listmem) (cexp-listmem  $1 $2)))
+             (lst ((openb listvalues closeb) (lst-non-empty $2)) ((openb closeb) (lst-empty)))
+             (listvalues ((exp) (listvalues-single $1)) ((exp and listvalues) (listvalues-multi $1 $3)))
+             (listmem ((openb exp closeb) (listmem-single $2)) ((openb exp closeb listmem) (listmem-multi $2 $4)))
              )))
 
 
