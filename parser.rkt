@@ -1,9 +1,140 @@
 #lang racket
 
+(require (lib "eopl.ss" "eopl"))
 
 (require parser-tools/lex
          (prefix-in : parser-tools/lex-sre)
          parser-tools/yacc)
+
+(define-datatype command command?
+  (command-unitcom
+   (unitcom-exp unitcom?))
+  (multi-command
+   (cmd command?)
+   (multi-unitcom unitcom?)))
+
+
+(define-datatype unitcom unitcom?
+  (whilecom-unit
+   (whilecom-exp whilecom?))
+  (ifcom-unit
+   (ifcom-exp ifcom?))
+  (assign-unit
+   (assign-exp assign?))
+  (return-unit
+   (return-exp return?)))
+
+
+(define-datatype whilecom whilecom?
+  (whilecom-ex
+   (exper exp?)
+   (cmd command?)))
+
+
+(define-datatype ifcom ifcom?
+  (if-exp
+   (exper exp?)
+   (do-cmd command?)
+   (else-cmd command?)))
+
+
+(define-datatype return return?
+  (return-ex
+   (return-exp exp?)))
+
+
+(define-datatype assign assign?
+  (assign-ex
+   (var-exp symbol?)
+   (exper exp?)))
+ 
+  
+(define-datatype exp exp?
+  (aexp-ex
+   (aexp-exp aexp?))
+
+  (aexp-bigger
+   (aexp1 aexp?)
+   (aexp2 aexp?))
+
+   (aexp-smaller
+   (aexp1 aexp?)
+   (aexp2 aexp?))
+  
+  (aexp-equal
+   (aexp1 aexp?)
+   (aexp2 aexp?))
+
+  (aexp-notequal
+   (aexp1 aexp?)
+   (aexp2 aexp?)))
+
+
+(define-datatype aexp aexp?
+  (b-exp
+    (bexpression bexp?))
+  (diff-exp
+    (exp1 bexp?)
+    (exp2 aexp?))
+  (plus-exp
+    (exp1 bexp?)
+    (exp2 aexp?)))
+
+
+(define-datatype bexp bexp?
+  (c-exp
+    (cexpression cexp?))
+  (multiply-exp
+    (exp1 cexp?)
+    (exp2 bexp?))
+  (divide-exp
+    (exp1 cexp?)
+    (exp2 bexp?)))
+
+
+(define-datatype cexp cexp?
+  (negative-exp
+    (expr cexp?))
+  (par-exp
+    (expr exp?))
+  (num
+    (pos-num positive?))
+  (null
+    (null-identifier null?))
+  (var-exp
+    (var symbol?))
+  (boolean
+    (bool-identifier boolean?))
+  (string
+    (string-identifier string?))
+  (list
+    (list-exp listexp?))
+  (id-listmem
+    (id symbol?)
+    (mem listmem?)))
+
+
+(define-datatype listexp listexp?
+  (empty-list
+    (null-list null?))
+  (non-empty-list
+    (list-vals list-values?)))
+
+
+(define-datatype list-values list-values?
+  (single-val
+    (expr exp?))
+  (multi-val
+    (expr exp?)
+    (list-val list-values?)))
+
+
+(define-datatype listmem listmem?
+  (single-mem
+    (expr exp?))
+  (multi-mem
+    (expr exp?)
+    (list-mem listmem?)))
 
 
 (define program "a = 0; while a < 1 do a = a - 1 end; return a")
