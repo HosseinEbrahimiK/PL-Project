@@ -6,7 +6,7 @@
          parser-tools/yacc)
 
 
-(define program "a=2;")
+(define program "a = 0; while a < 1 do a = a - 1 end; return a")
 
 (define simple-math-lexer
            (lexer
@@ -70,5 +70,5 @@
 
 
 (define lex-this (lambda (lexer input) (lambda () (lexer input))))
-(define my-lexer (lex-this simple-math-lexer (open-input-string "while a < 5 do a = a - 1 end")))
+(define my-lexer (lex-this simple-math-lexer (open-input-string program)))
 (let ((parser-res (simple-math-parser my-lexer))) parser-res)
