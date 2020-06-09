@@ -1,5 +1,3 @@
-#lang racket
-
 (require (lib "eopl.ss" "eopl"))
 
 (require parser-tools/lex
@@ -115,7 +113,7 @@
 
 (define-datatype lst lst?
   (lst-empty
-    (null-list null?))
+    )
   (lst-non-empty
     (list-vals listvalues?)))
 
@@ -136,7 +134,7 @@
     (list-mem listmem?)))
 
 
-(define program "a = 3; while a < 1 do a = a - 1 end; return a")
+(define program "a = []")
 
 (define simple-math-lexer
            (lexer
@@ -201,4 +199,3 @@
 
 (define lex-this (lambda (lexer input) (lambda () (lexer input))))
 (define my-lexer (lex-this simple-math-lexer (open-input-string program)))
-(let ((parser-res (simple-math-parser my-lexer))) parser-res)
