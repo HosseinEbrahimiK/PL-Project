@@ -1,4 +1,3 @@
-#lang racket
 
 (require (lib "eopl.ss" "eopl"))
 

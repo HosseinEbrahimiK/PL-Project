@@ -134,7 +134,6 @@
     (list-mem listmem?)))
 
 
-(define program "a = []")
 
 (define simple-math-lexer
            (lexer
@@ -197,5 +196,4 @@
              )))
 
 
-(define lex-this (lambda (lexer input) (lambda () (lexer input))))
-(define my-lexer (lex-this simple-math-lexer (open-input-string program)))
+
