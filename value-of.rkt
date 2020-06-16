@@ -363,7 +363,10 @@
 (define (list-index l index)
   (if (empty? index)
       l
-      (list-index (list-ref l (first index)) (rest index)))
+      (if (>= (first index) (length l))
+          (list 'error "list index out of range dude!!!")
+          (list-index (list-ref l (first index)) (rest index)))
+      )
   )
 
 
