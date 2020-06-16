@@ -248,13 +248,13 @@
                      [else (raise "This kind of data can not be negative.")])
                     ))
 
-      (cexp-par (expr) (value-of-exp expr))
+      (cexp-par (expr) (value-of-exp expr env))
                 
       (cexp-num (num-exp) num-exp)
 
       (cexp-null (null-exp) null-exp)
 
-      (cexp-var (var) var)
+      (cexp-var (var) (apply-env env var))
 
       (cexp-bool (bool-exp) bool-exp)
 

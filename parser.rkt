@@ -88,6 +88,7 @@
     (exp1 cexp?)
     (exp2 bexp?)))
 
+(define non-negative? (lambda (v) (or (zero? v) (positive? v))))
 
 (define-datatype cexp cexp?
   (cexp-comp
@@ -95,7 +96,7 @@
   (cexp-par
     (expr exp?))
   (cexp-num
-    (pos-num positive?))
+    (pos-num non-negative?))
   (cexp-null
     (null-identifier null?))
   (cexp-var
