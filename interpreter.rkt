@@ -21,10 +21,8 @@
 
 
 
+
 (interperet "prog.txt")
-
-
-
 
 
       
