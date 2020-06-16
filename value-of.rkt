@@ -1,4 +1,4 @@
-;(require (lib "eopl.ss" "eopl"))
+(require (lib "eopl.ss" "eopl"))
 (require racket/include)
 ;(include "parser.rkt")
 ;(include "env_code.rkt")
@@ -346,10 +346,18 @@
 
 (define (value-of-listmem lm env)
   (cases listmem lm
-   (listmem-single (index) (list (value-of-exp index env)))
-   (listmem-multi (index rindex) (cons (value-of-exp index env) (value-of-listmem rindex env)))))
+   (listmem-single (index) (list (expmem->val index env)))
+   (listmem-multi (index rindex) (cons (expmem->val index env) (value-of-listmem rindex env)))))
 
-
+(define (expmem->val expr env)
+  (let
+      ([val (value-of-exp expr env)])
+    (cond
+      [(not (integer? val)) (list 'error "list index must be a number")]
+      [(negative? val) (list 'error "list index can not be negative")]
+      [else val])
+    )
+)
 
 
 (define (list-index l index)
