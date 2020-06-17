@@ -22,7 +22,7 @@
 
 
 
-(interperet "prog.txt")
+(interperet "Tests_1/5.txt")
 
 
       
