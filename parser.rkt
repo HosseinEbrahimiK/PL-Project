@@ -165,7 +165,7 @@
             ("true" (token-true))
             ("false" (token-false))
             ("null" (token-null))
-            ((:: "\"" any-string "\"") (token-string lexeme))
+            ((:: "\"" (:* (:~ "\"")) "\"") (token-string (substring lexeme 1 (- (string-length lexeme) 1))))
             ((:+ alphabetic) (token-id (string->symbol lexeme)))
             (whitespace (simple-math-lexer input-port))
             ((eof) (token-EOF))))
