@@ -1,2 +1,2 @@
-a = "a" + " b";
+a = [true, false, true] * 2;
 return a

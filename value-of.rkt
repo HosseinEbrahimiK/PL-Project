@@ -9,35 +9,35 @@
                    [(number? (car List)) (append (list(- (car List))) (comp (cdr List)))]
                    [(boolean? (car List)) (append (list(not (car List))) (comp (cdr List)))]
                    [(list? (car List)) (append (list(comp (car List))) (comp (cdr List)))]
-                   [else (raise "invalid list entry")]
+                   [else (raise "invalid type entry for complement operation.")]
                   ))
 
 (define (operation List num f) (cond
                    [(null? List) '()]
                    [(number? (car List)) (append (list(f (car List) num)) (operation (cdr List) num f))]
                    [(list? (car List)) (append (list(operation (car List) num f)) (operation (cdr List) num f))]
-                   [else (raise "invalid operation dude.")]
+                   [else (raise "Not a number type for list entry due to multiply/divide/add/minus operation.")]
                   ))
 
 (define (bool-mult List bool-val) (cond
                                      [(null? List) '()]
                                      [(boolean? (car List)) (append (list(and (car List) bool-val)) (bool-mult (cdr List) bool-val))]
                                      [(list? (car List)) (append (list(bool-mult (car List) bool-val)) (bool-mult (cdr List) bool-val))]
-                                     [else (begin (display (car List)) (display " is not a boolean ,OMEGA LUL."))]
+                                     [else (raise "Not a boolean type for list entry due to boolean AND operation.")]
                                      ))
 
 (define (bool-or List bool-val) (cond
                                      [(null? List) '()]
                                      [(boolean? (car List)) (append (list(or (car List) bool-val)) (bool-or (cdr List) bool-val))]
                                      [(list? (car List)) (append (list(bool-or (car List) bool-val)) (bool-or (cdr List) bool-val))]
-                                     [else (begin (display (car List)) (display " is not a boolean bru."))]
+                                     [else (raise "Not boolean type for list entry due to boolean OR operation.")]
                                      ))
 
 (define (str-app List str) (cond
                    [(null? List) '()]
                    [(string? (car List)) (append (list(string-append (car List) str)) (str-app (cdr List) str))]
                    [(list? (car List)) (append (list(str-app (car List) str)) (str-app (cdr List) str))]
-                   [else (begin (display (car List)) (display " is not a type of string WTF!!."))]
+                   [else (raise "Not a string type for list entry due to string appending operation.")]
                   ))
 
 
@@ -245,7 +245,7 @@
                      [(number? val) (- val)]
                      [(boolean? val) (not val)]
                      [(list? val) (comp val)]
-                     [else (raise "This kind of data can not be negative.")])
+                     [else (raise "Input data type can not be complement.")])
                     ))
 
       (cexp-par (expr) (value-of-exp expr env))
@@ -280,7 +280,7 @@
                      [(and (boolean? operand1) (boolean? operand2)) (and operand1 operand2)]
                      [(and (boolean? operand1) (list? operand2)) (bool-mult operand2 operand1)]
                      [(and (list? operand1) (boolean? operand2)) (bool-mult operand1 operand2)]
-                     [else (raise "ERROR")])
+                     [else (raise "Invalid operand type for multiply operation.")])
                      ))
 
       (bexp-div (exp1 exp2)
@@ -290,7 +290,7 @@
                      [(and (number? operand1) (number? operand2)) (/ operand1 operand2)]
                      [(and (number? operand1) (list? operand2)) (operation operand2 operand1 /)]
                      [(and (list? operand1) (number? operand2)) (operation operand1 operand2 /)]
-                     [else (raise (list 'error "ERROR"))])
+                     [else (raise  "Invalid operand type for divide operation.")])
                      ))
                 )))
 
@@ -308,7 +308,7 @@
                      [(and (number? operand1) (number? operand2)) (- operand1 operand2)]
                      [(and (number? operand1) (list? operand2)) (operation operand2 operand1 -)]
                      [(and (list? operand1) (number? operand2)) (operation operand1 operand2 -)]
-                     [else (raise (list 'error "ERROR"))])
+                     [else (raise "Invalid operand type for minus operation.")])
                      ))
 
      (aexp-plus (exp1 exp2)
@@ -325,7 +325,7 @@
                      [(and (string? operand1) (list? operand2)) (str-app operand2 operand1)]
                      [(and (list? operand1) (string? operand2)) (str-app operand1 operand2)]
                      [(and (list? operand1) (list? operand2)) (append operand1 operand2)]
-                     [else (raise (list 'error "ERROR"))])
+                     [else (raise "Invalid operand type for sum operation.")])
                      ))
        )))
 
