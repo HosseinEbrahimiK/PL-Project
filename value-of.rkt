@@ -122,7 +122,7 @@
                                                                     (map (lambda (x) (string<? x operand2)) operand1)
                                                                     false)]
                       
-                      [(and (number? operand1) (list? operand2)) ((if (andmap number? operand2)
+                      [(and (number? operand1) (list? operand2)) (begin (if (andmap number? operand2)
                                                            (map (lambda (x) (> x operand1)) operand2)
                                                            false))]
                       
