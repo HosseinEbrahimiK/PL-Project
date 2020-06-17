@@ -128,7 +128,9 @@
                       
                       [(and (list? operand1) (number? operand2))((if (andmap number? operand1)
                                                            (map (lambda (x) (< x operand2)) operand1)
-                                                           false))])))
+                                                           false))]
+                       [else (raise "NOT valid types of data for bigger comparison")]
+                      )))
                      
      (exp-smaller (exp1 exp2)
       (let ([operand1 (value-of-aexp exp1 env)]
@@ -136,7 +138,7 @@
                    (cond
                       [(and (number? operand1) (number? operand2)) (< operand1 operand2)]
                       
-                      [(and (string? operand1) (string? operand2)) ((string>? operand1 operand2))]
+                      [(and (string? operand1) (string? operand2)) (string>? operand1 operand2)]
                       
                       [(and (string? operand1) (list? operand2)) (if (andmap string? operand2)
                                                                      (map (lambda (x) (string<? x operand1)) operand2)
@@ -152,7 +154,9 @@
                       
                       [(and (list? operand1) (number? operand2)) ((if (andmap number? operand1)
                                                            (map (lambda (x) (> x operand2)) operand1)
-                                                           false))])))
+                                                           false))]
+                      [else (raise "NOT valid types of data for smaller comparison")]
+                      )))
       
 
       
@@ -190,6 +194,7 @@
            [(and (null? operand1) (list? operand2)) ((if (andmap null? operand2)
                                                            (map (lambda (x) (eq? x operand1)) operand2)
                                                            false))]
+           [else (raise "NOT valid types of data for equality comparison")]
            
 )))
       
@@ -227,6 +232,7 @@
            [(and (null? operand1) (list? operand2)) ((if (andmap null? operand2)
                                                            (map (lambda (x) (not(eq? x operand1))) operand2)
                                                            true))]
+           [else (raise "NOT valid types of data for not-equal comparison")]
            
 )))
      
