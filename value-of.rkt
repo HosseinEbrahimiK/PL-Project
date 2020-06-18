@@ -176,7 +176,7 @@
          (cond
            [(and (number? operand1) (number? operand2)) (equal? operand1 operand2)]
            [(and (string? operand1) (string? operand2)) (equal? operand1 operand2)]
-           [(and (null? operand1) (null? operand2)) (true)]
+           [(and (null? operand1) (null? operand2)) true]
            [(and (boolean? operand1) (boolean? operand2)) (equal? operand1 operand2)]
            [(and (list? operand1) (list? operand2)) (equal? operand1 operand2)]
            [(and (list? operand1) (number? operand2)) (if (andmap number? operand1)
@@ -215,7 +215,7 @@
          (cond
            [(and (number? operand1) (number? operand2)) (not (equal? operand1 operand2))]
            [(and (string? operand1) (string? operand2))(not (equal? operand1 operand2))]
-           [(and (null? operand1) (null? operand2)) (false)]
+           [(and (null? operand1) (null? operand2)) false]
            [(and (boolean? operand1) (boolean? operand2)) (not (equal? operand1 operand2))]
            [(and (list? operand1) (list? operand2)) (not (equal? operand1 operand2))]
            [(and (list? operand1) (number? operand2)) (if (andmap number? operand1)
