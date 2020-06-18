@@ -4,6 +4,9 @@
          (prefix-in : parser-tools/lex-sre)
          parser-tools/yacc)
 
+(define null 'null)
+(define (null? n) (equal? n 'null))
+
 (define-datatype command command?
   (command-single
    (ucmd unitcom?))

@@ -115,7 +115,9 @@
     (exp-bigger (exp1 exp2)
                  (let ([operand1 (value-of-aexp exp1 env)]
                        [operand2 (value-of-aexp exp2 env)])
-                   (cond
+                   (begin
+
+                    (cond
                       [(and (number? operand1) (number? operand2)) (> operand1 operand2)]
                       
                       [(and (string? operand1) (string? operand2)) (string<? operand1 operand2)]
@@ -133,8 +135,8 @@
                       [(and (list? operand1) (number? operand2))(if (andmap number? operand1)
                                                            (map (lambda (x) (> x operand2)) operand1)
                                                            false)]
-                       [else (raise "NOT valid types of data for bigger comparison")]
-                      )))
+                       [else  (raise (list 'error "NOT valid types of data for bigger comparison"))]
+                      ))))
                      
      (exp-smaller (exp1 exp2)
       (let ([operand1 (value-of-aexp exp1 env)]
