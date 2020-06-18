@@ -1,0 +1,3 @@
+A = "hi";
+B = 4;
+return A > B
