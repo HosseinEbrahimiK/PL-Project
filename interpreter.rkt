@@ -23,7 +23,9 @@
 
 
 
+
 (interperet "prog.txt")
+
 
 
 
