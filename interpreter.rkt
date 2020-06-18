@@ -12,7 +12,7 @@
   (define lex-this (lambda (lexer input) (lambda () (lexer input))))
   (define my-lexer (lex-this simple-math-lexer (open-input-string (file->string in #:mode 'text))))
   (with-handlers (
-                  [(lambda (v) (list? v)) (lambda (v) (list-ref v 1))])
+                  [(lambda (v)  (list? v)) (lambda (v) (list-ref v 1))])
     (value-of-command (let ((parser-res (simple-math-parser my-lexer))) parser-res) (empty-env))
   )
 )
