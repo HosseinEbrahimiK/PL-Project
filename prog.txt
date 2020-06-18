@@ -1,4 +1,2 @@
-a = 10;
-c=0;
-while a > 5 do a = a - 1;c = c + a end;
-return c
+a = null;
+return null

@@ -190,7 +190,7 @@
              (exp ((aexp) (exp-aexp $1)) ((aexp greater aexp) (exp-bigger $1 $3)) ((aexp less aexp) (exp-smaller $1 $3)) ((aexp eq aexp) (exp-equal $1 $3)) ((aexp noteq aexp) (exp-not-equal $1 $3)))
              (aexp ((bexp) (aexp-bexp $1)) ((bexp min aexp) (aexp-minus $1 $3)) ((bexp plus aexp) (aexp-plus $1 $3)))
              (bexp ((cexp) (bexp-cexp $1)) ((cexp mult bexp) (bexp-mult $1 $3)) ((cexp div bexp) (bexp-div $1 $3)))
-             (cexp ((min cexp) (cexp-comp $2)) ((openp exp closep) (cexp-par $2)) ((NUM) (cexp-num  $1)) ((null) (cexp-null)) ((id) (cexp-var  $1)) ((true) (cexp-bool #t)) ((false) (cexp-bool #f)) ((string) (cexp-string $1)) ((lst) (cexp-list $1)) ((id listmem) (cexp-listmem  $1 $2)))
+             (cexp ((min cexp) (cexp-comp $2)) ((openp exp closep) (cexp-par $2)) ((NUM) (cexp-num  $1)) ((null) (cexp-null null)) ((id) (cexp-var  $1)) ((true) (cexp-bool #t)) ((false) (cexp-bool #f)) ((string) (cexp-string $1)) ((lst) (cexp-list $1)) ((id listmem) (cexp-listmem  $1 $2)))
              (lst ((openb listvalues closeb) (lst-non-empty $2)) ((openb closeb) (lst-empty)))
              (listvalues ((exp) (listvalues-single $1)) ((exp and listvalues) (listvalues-multi $1 $3)))
              (listmem ((openb exp closeb) (listmem-single $2)) ((openb exp closeb listmem) (listmem-multi $2 $4)))
