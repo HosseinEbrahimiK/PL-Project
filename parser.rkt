@@ -153,7 +153,7 @@
             (">" (token-greater))
             ("<" (token-less))
             ("==" (token-eq))
-            ("!=" '(token-noteq))
+            ("!=" (token-noteq))
             ("-" (token-min))
             ("*" (token-mult))
             ("/" (token-div))

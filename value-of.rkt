@@ -64,12 +64,16 @@
 
 
 (define (value-of-whilecom wcmd env)
-  (cases whilecom wcmd
+ (let ([r env])
+   (begin
+   (cases whilecom wcmd
     (while-cmd (exper cmd)
-             (let ([r env])
              (while 
              (value-of-exp exper r)
-             (set! r (value-of-command cmd env)))))))
+             (begin
+              (set! r (value-of-command cmd r))))))
+   r
+   )))
 
 
 
@@ -157,75 +161,79 @@
 
       
       (exp-equal (exp1 exp2)
-       (let ([operand1 (value-of-aexp exp1 env)]
+       
+         (let ([operand1 (value-of-aexp exp1 env)]
                        [operand2 (value-of-aexp exp2 env)])
+         (begin
+         
+         
          (cond
-           [(and (number? operand1) (number? operand2)) (eq? operand1 operand2)]
-           [(and (string? operand1) (string? operand2)) (eq? operand1 operand2)]
+           [(and (number? operand1) (number? operand2)) (equal? operand1 operand2)]
+           [(and (string? operand1) (string? operand2)) (equal? operand1 operand2)]
            [(and (null? operand1) (null? operand2)) (true)]
-           [(and (boolean? operand1) (boolean? operand2)) (eq? operand1 operand2)]
-           [(and (list? operand1) (list? operand2)) (eq? operand1 operand2)]
+           [(and (boolean? operand1) (boolean? operand2)) (equal? operand1 operand2)]
+           [(and (list? operand1) (list? operand2)) (equal? operand1 operand2)]
            [(and (list? operand1) (number? operand2)) ((if (andmap number? operand1)
-                                                           (map (lambda (x) (eq? x operand2)) operand1)
+                                                           (map (lambda (x) (equal? x operand2)) operand1)
                                                            false))]
            [(and (number? operand1) (list? operand2)) ((if (andmap number? operand2)
-                                                           (map (lambda (x) (eq? x operand1)) operand2)
+                                                           (map (lambda (x) (equal? x operand1)) operand2)
                                                            false))]
            [(and (list? operand1) (string? operand2)) ((if (andmap string? operand1)
-                                                           (map (lambda (x) (eq? x operand2)) operand1)
+                                                           (map (lambda (x) (equal? x operand2)) operand1)
                                                            false))]
            [(and (string? operand1) (list? operand2)) ((if (andmap string? operand2)
-                                                           (map (lambda (x) (eq? x operand1)) operand2)
+                                                           (map (lambda (x) (equal? x operand1)) operand2)
                                                            false))]
            
            [(and (list? operand1) (boolean? operand2)) ((if (andmap boolean? operand1)
-                                                           (map (lambda (x) (eq? x operand2)) operand1)
+                                                           (map (lambda (x) (equal? x operand2)) operand1)
                                                            false))]
            [(and (boolean? operand1) (list? operand2)) ((if (andmap boolean? operand2)
-                                                           (map (lambda (x) (eq? x operand1)) operand2)
+                                                           (map (lambda (x) (equal? x operand1)) operand2)
                                                            false))]
            [(and (list? operand1) (null? operand2)) ((if (andmap null? operand1)
-                                                           (map (lambda (x) (eq? x operand2)) operand1)
+                                                           (map (lambda (x) (equal? x operand2)) operand1)
                                                            false))]
            [(and (null? operand1) (list? operand2)) ((if (andmap null? operand2)
-                                                           (map (lambda (x) (eq? x operand1)) operand2)
+                                                           (map (lambda (x) (equal? x operand1)) operand2)
                                                            false))]
            
-)))
+))))
       
 
        (exp-not-equal (exp1 exp2)
         (let ([operand1 (value-of-aexp exp1 env)]
                        [operand2 (value-of-aexp exp2 env)])
          (cond
-           [(and (number? operand1) (number? operand2)) (not (eq? operand1 operand2))]
-           [(and (string? operand1) (string? operand2))(not (eq? operand1 operand2))]
+           [(and (number? operand1) (number? operand2)) (not (equal? operand1 operand2))]
+           [(and (string? operand1) (string? operand2))(not (equal? operand1 operand2))]
            [(and (null? operand1) (null? operand2)) (false)]
-           [(and (boolean? operand1) (boolean? operand2)) (not (eq? operand1 operand2))]
-           [(and (list? operand1) (list? operand2)) (not (eq? operand1 operand2))]
+           [(and (boolean? operand1) (boolean? operand2)) (not (equal? operand1 operand2))]
+           [(and (list? operand1) (list? operand2)) (not (equal? operand1 operand2))]
            [(and (list? operand1) (number? operand2)) ((if (andmap number? operand1)
-                                                           (map (lambda (x) (not(eq? x operand2))) operand1)
+                                                           (map (lambda (x) (not(equal? x operand2))) operand1)
                                                            true))]
            [(and (number? operand1) (list? operand2)) ((if (andmap number? operand2)
-                                                           (map (lambda (x) (not(eq? x operand1))) operand2)
+                                                           (map (lambda (x) (not(equal? x operand1))) operand2)
                                                            true))]
            [(and (list? operand1) (string? operand2)) (if (andmap string? operand1)
-                                                           (map (lambda (x) (not(eq? x operand2))) operand1)
+                                                           (map (lambda (x) (not(equal? x operand2))) operand1)
                                                            true)]
            [(and (string? operand1) (number? operand2)) (if (andmap string? operand2)
-                                                           (map (lambda (x) (not(eq? x operand1))) operand2)
+                                                           (map (lambda (x) (not(equal? x operand1))) operand2)
                                                            true)]
            [(and (list? operand1) (boolean? operand2)) ((if (andmap boolean? operand1)
-                                                           (map (lambda (x) (not(eq? x operand2))) operand1)
+                                                           (map (lambda (x) (not(equal? x operand2))) operand1)
                                                            true))]
            [(and (boolean? operand1) (list? operand2)) ((if (andmap boolean? operand2)
-                                                           (map (lambda (x) (not(eq? x operand1))) operand2)
+                                                           (map (lambda (x) (not(equal? x operand1))) operand2)
                                                            true))]
            [(and (list? operand1) (null? operand2)) ((if (andmap null? operand1)
-                                                           (map (lambda (x) (not(eq? x operand2))) operand1)
+                                                           (map (lambda (x) (not(equal? x operand2))) operand1)
                                                            true))]
            [(and (null? operand1) (list? operand2)) ((if (andmap null? operand2)
-                                                           (map (lambda (x) (not(eq? x operand1))) operand2)
+                                                           (map (lambda (x) (not(equal? x operand1))) operand2)
                                                            true))]
            
 )))
