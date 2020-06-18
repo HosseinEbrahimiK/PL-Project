@@ -22,7 +22,7 @@
 
 
 
-(interperet "Tests_1/8.txt")
+(interperet "Tests_1/9.txt")
 
 
       
