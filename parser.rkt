@@ -138,6 +138,33 @@
     (list-mem listmem?)))
 
 
+(define-datatpe function function?
+  (func-exp
+   (variables vars?)
+   (cmd command?)))
+
+
+(define-datatype vars vars?
+  (single-var
+   (var symbol?))
+  (multi-var
+   (first-var symbol?)
+   (rest-var vars?)))
+
+
+(define-datatype call call?
+  (call-exp
+   (variable vars?)
+   (argument args?)))
+
+
+(define-datatype args args?
+  (sigle-exp
+   (expr exp?))
+  (multi-exp
+   (first-expr exp?)
+   (rest-expr args?)))
+
 
 (define simple-math-lexer
            (lexer
