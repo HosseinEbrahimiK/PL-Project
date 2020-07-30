@@ -138,7 +138,7 @@
     (list-mem listmem?)))
 
 
-(define-datatpe function function?
+(define-datatype function function?
   (func-exp
    (variables vars?)
    (cmd command?)))
