@@ -1,3 +1,4 @@
+;#lang racket
 (require (lib "eopl.ss" "eopl"))
 
 (require parser-tools/lex
@@ -44,9 +45,15 @@
 
 
 (define-datatype assign assign?
-  (assign-cmd
+  (assign-cmd-exp
    (var-exp symbol?)
-   (exper exp?)))
+   (exper exp?))
+  (assign-cmd-func
+   (var-exp symbol?)
+   (func function?))
+  (assign-cmd-call
+   (var-exp symbol?)
+   (call-func call?)))
  
   
 (define-datatype exp exp?
@@ -68,6 +75,7 @@
   (exp-not-equal
    (aexp1 aexp?)
    (aexp2 aexp?)))
+
 
 
 (define-datatype aexp aexp?
@@ -139,9 +147,9 @@
 
 
 (define-datatype function function?
-  (func-exp
+  (func-def
    (variables vars?)
-   (cmd command?)))
+   (body command?)))
 
 
 (define-datatype vars vars?
@@ -153,15 +161,15 @@
 
 
 (define-datatype call call?
-  (call-exp
-   (variable vars?)
+  (call-func
+   (func-name symbol?)
    (argument args?)))
 
 
 (define-datatype args args?
-  (sigle-exp
+  (single-arg
    (expr exp?))
-  (multi-exp
+  (multi-arg
    (first-expr exp?)
    (rest-expr args?)))
 
@@ -189,19 +197,22 @@
             ("/" (token-div))
             ("(" (token-openp))
             (")" (token-closep))
+            ("{" (token-openg))
+            ("}" (token-closeg))
             ("[" (token-openb))
             ("]" (token-closeb))
             ("," (token-and))
             ("true" (token-true))
             ("false" (token-false))
             ("null" (token-null))
+            ("func" (token-func))
             ((:: "\"" (:* (:~ "\"")) "\"") (token-string (substring lexeme 1 (- (string-length lexeme) 1))))
             ((:+ alphabetic) (token-id (string->symbol lexeme)))
             (whitespace (simple-math-lexer input-port))
             ((eof) (token-EOF))))
 
 (define-tokens a (NUM string id))
-(define-empty-tokens b (EOF plus semi while do end asgn if then else endif rtn greater less eq noteq min mult div openp closep openb closeb and true false null))
+(define-empty-tokens b (EOF plus semi while do end asgn if then else endif rtn greater less eq noteq min mult div openp closep openb closeb and true false null openg closeg func))
 
 
 (define simple-math-parser
@@ -214,7 +225,11 @@
              (command ((unitcom) (command-single $1)) ((command semi unitcom) (command-multi $1 $3)))
              (unitcom ((whilecom) (unitcom-while $1)) ((ifcom) (unitcom-if $1)) ((assign) (unitcom-assign $1)) ((return) (unitcom-return $1)))
              (whilecom ((while exp do command end) (while-cmd $2 $4)))
-             (assign ((id asgn exp) (assign-cmd $1 $3)))
+             (assign ((id asgn exp) (assign-cmd-exp $1 $3)) ((id asgn function) (assign-cmd-func $1 $3)) ((id asgn call) (assign-cmd-call $1 $3)))
+             (function ((func openp vars closep openg command closeg) (func-def $3 $6)))
+             (call ((id openp args closep) (call-func $1 $3)))
+             (vars ((id) (single-var $1)) ((id and vars) (multi-var $1 $3)))
+             (args ((exp) (single-arg $1)) ((exp and args) (multi-arg $1 $3)))
              (ifcom ((if exp then command else command endif) (if-cmd $2 $4 $6)))
              (return ((rtn exp) (return-cmd $2)))
              (exp ((aexp) (exp-aexp $1)) ((aexp greater aexp) (exp-bigger $1 $3)) ((aexp less aexp) (exp-smaller $1 $3)) ((aexp eq aexp) (exp-equal $1 $3)) ((aexp noteq aexp) (exp-not-equal $1 $3)))
@@ -225,6 +240,25 @@
              (listvalues ((exp) (listvalues-single $1)) ((exp and listvalues) (listvalues-multi $1 $3)))
              (listmem ((openb exp closeb) (listmem-single $2)) ((openb exp closeb listmem) (listmem-multi $2 $4)))
              )))
+
+
+;(define (interperet in)
+;  (define lex-this (lambda (lexer input) (lambda () (lexer input))))
+;  (define my-lexer (lex-this simple-math-lexer (open-input-string (file->string in #:mode 'text))))
+;  (with-handlers (
+;                  [(lambda (v)  (list? v)) (lambda (v) (list-ref v 1))])
+;    (simple-math-parser my-lexer)
+;  )
+;)
+
+
+
+
+
+
+
+
+;(interperet "prog.txt")
 
 
 
