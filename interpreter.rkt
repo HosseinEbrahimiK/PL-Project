@@ -1,7 +1,7 @@
 #lang racket
 (require (lib "eopl.ss" "eopl"))
 (require racket/include)
-(include "parser.rkt")
+;(include "parser.rkt")
 (include "env_code.rkt")
 (include "value-of.rkt")
 

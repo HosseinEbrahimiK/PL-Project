@@ -1,6 +1,6 @@
 (require (lib "eopl.ss" "eopl"))
 (require racket/include)
-;(include "parser.rkt")
+(include "parser.rkt")
 ;(include "env_code.rkt")
 (require dyoo-while-loop)
 
@@ -88,10 +88,50 @@
                          (value-of-command exp3 env)))))))
                      
 (define (value-of-assign asgn env)
+  (begin
+    ;(display asgn)
+    ;(display "\n\n")
   (cases assign asgn
-    (assign-cmd (var expr)
-    (extend-env var (value-of-exp expr env) env)))
+    (assign-cmd-exp (var expr)
+    (extend-env var (value-of-exp expr env) env))
+    (assign-cmd-func (var func)
+                     (extend-env-func var func env))
+    (assign-cmd-call (var cl)
+                     (begin
+                       ;(display "in cmd bitch\n")
+                       (let ([res (value-of-call cl env)])
+                       (begin
+                        ; (display "arrrr ")
+                         ;(display res)
+                         ;(display "\n")
+                         (extend-env var res env))))
+                     )))
 )
+
+(define (value-of-call cl env)
+  (begin
+    (cases call cl
+  (call-func (proc-name arguments)
+             (let ([pr (apply-env env proc-name)])
+               (cases proc pr
+                 (procedure (var body saved-env)
+                            (with-handlers (
+                  [(lambda (v)  (list? v)) (lambda (v) (list-ref v 1))])
+    (value-of-command body (extend-arg arguments var saved-env env))
+  )
+                            )))))))
+
+(define (extend-arg ar va saved-env env)
+  (cases args ar
+    (single-arg (a)
+                (cases vars va
+                  (single-var (v) (extend-env v (value-of-exp a env) saved-env))
+                  (multi-var (first-var rest-var) (raise "More Args Needed!"))))
+    (multi-arg (first-arg rest-arg)
+               (cases vars va
+                  (single-var (v) (raise "Unexpected Arg!"))
+                  (multi-var (first-var rest-var) (extend-arg rest-arg rest-var (extend-env first-var (value-of-exp first-arg env) saved-env) env))))
+    ))
 
 
            
