@@ -4,6 +4,61 @@
 ;(include "env_code.rkt")
 (require dyoo-while-loop)
 
+;;;;; ENV IS HERE
+(define-datatype proc proc?
+  (procedure
+   (var vars?)
+   (body command?)
+   (env enviroment?))
+)
+(define (any? obj)
+  true)
+(define-datatype enviroment enviroment?
+  
+  (empty-env)
+  
+  (extend-env
+   (var symbol?)
+   (val any?)
+   (env enviroment?))
+
+  (extend-env-func
+   (name symbol?)
+   (func function?)
+   (env enviroment?)))
+
+(define-datatype thunk thunk?
+  (a-thunk
+   (expr exp?)
+   (saved-env enviroment?))
+  )
+
+
+(define apply-env
+  (lambda (env search-var)
+   (begin
+     ;(display search-var)
+     ;(display " in:\n")
+     ;(display env)
+     ;(display "\n\n")
+     (cases enviroment env
+     (empty-env () (display "report-no-binding-found"))
+     (extend-env (saved-var saved-val saved-env)
+                 (if (eqv? search-var saved-var)
+                     (if (thunk? saved-val) (cases thunk saved-val
+                                              (a-thunk (expr saved-env) (value-of-exp expr saved-env))) saved-val) 
+                     (apply-env saved-env search-var)))
+     
+     (extend-env-func (p-name func saved-env)
+                     (if (eqv? search-var p-name)
+                         (cases function func
+                           (func-def (vars body) (procedure vars body env)))
+                          (apply-env saved-env search-var)))))))
+
+
+
+;;;;;;;;;;;;; Value Of
+
 (define (comp List) (cond
                    [(null? List) '()]
                    [(number? (car List)) (append (list(- (car List))) (comp (cdr List)))]
@@ -93,7 +148,7 @@
     ;(display "\n\n")
   (cases assign asgn
     (assign-cmd-exp (var expr)
-    (extend-env var (value-of-exp expr env) env))
+    (extend-env var (a-thunk expr env) env))
     (assign-cmd-func (var func)
                      (extend-env-func var func env))
     (assign-cmd-call (var cl)
@@ -125,12 +180,12 @@
   (cases args ar
     (single-arg (a)
                 (cases vars va
-                  (single-var (v) (extend-env v (value-of-exp a env) saved-env))
+                  (single-var (v) (extend-env v (a-thunk a env) saved-env))
                   (multi-var (first-var rest-var) (raise "More Args Needed!"))))
     (multi-arg (first-arg rest-arg)
                (cases vars va
                   (single-var (v) (raise "Unexpected Arg!"))
-                  (multi-var (first-var rest-var) (extend-arg rest-arg rest-var (extend-env first-var (value-of-exp first-arg env) saved-env) env))))
+                  (multi-var (first-var rest-var) (extend-arg rest-arg rest-var (extend-env first-var (a-thunk first-arg env) saved-env) env))))
     ))
 
 

@@ -1,5 +1,5 @@
 ;#lang racket
-(require (lib "eopl.ss" "eopl"))
+;(require (lib "eopl.ss" "eopl"))
 ;(include "parser.rkt")
 ;(include "value-of.rkt")
 
@@ -24,6 +24,8 @@
    (name symbol?)
    (func function?)
    (env enviroment?)))
+
+
 
 (define apply-env
   (lambda (env search-var)
