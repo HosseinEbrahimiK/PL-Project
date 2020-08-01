@@ -382,15 +382,16 @@
       (bexp-cexp (expr) (value-of-cexp expr env))
 
       (bexp-mult (exp1 exp2)
-                 (let ([operand1 (value-of-cexp exp1 env)]
-                       [operand2 (value-of-bexp exp2 env)])
+                 (let ([operand1 (value-of-cexp exp1 env)])
                    (cond
-                     [(and (number? operand1) (number? operand2)) (* operand1 operand2)]
-                     [(and (number? operand1) (list? operand2)) (operation operand2 operand1 *)]
-                     [(and (list? operand1) (number? operand2)) (operation operand1 operand2 *)]
-                     [(and (boolean? operand1) (boolean? operand2)) (and operand1 operand2)]
-                     [(and (boolean? operand1) (list? operand2)) (bool-mult operand2 operand1)]
-                     [(and (list? operand1) (boolean? operand2)) (bool-mult operand1 operand2)]
+                     [(number? operand1) (if (zero? operand1) 0 (* operand1 (value-of-bexp exp2 env)))]
+                     [(boolean? operand1) (if (false? operand1) #f (and operand1 (value-of-bexp exp2 env)))]
+                     
+                     [(and (number? operand1) (list? (value-of-bexp exp2 env))) (operation (value-of-bexp exp2 env) operand1 *)]
+                     [(and (list? operand1) (number? (value-of-bexp exp2 env))) (operation operand1 (value-of-bexp exp2 env) *)]     
+                     [(and (boolean? operand1) (list? (value-of-bexp exp2 env))) (bool-mult (value-of-bexp exp2 env) operand1)]
+                     [(and (list? operand1) (boolean? (value-of-bexp exp2 env))) (bool-mult operand1 (value-of-bexp exp2 env))]
+                     
                      [else (raise "Invalid operand type for multiply operation.")])
                      ))
 
