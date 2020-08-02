@@ -17,11 +17,6 @@
 
 
 
-
-
-
-
-
 (interperet "prog.txt")
 
 

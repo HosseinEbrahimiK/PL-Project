@@ -1,12 +1,11 @@
 #lang racket
 (require (lib "eopl.ss" "eopl"))
 (require racket/include)
-(include "value-of.rkt")
 
-(define (pow a b) (if (= b 0) 1
-                      (if (positive? b)
-                      (* a (pow a (- b 1 )))
-                      (/ 1 (pow a (- b)))
+(define (pow l) (if (= (list-ref l 1) 0) 1
+                      (if (positive? (list-ref l 1))
+                      (* (list-ref l 0) (pow (list (list-ref l 0) (- (list-ref l 1) 1 ))))
+                      (/ 1 (list (pow (list-ref l 0) (- (list-ref l 1)))))
                       )))
 
 (define (reverse l)
@@ -16,7 +15,10 @@
   )
 )
 
-(define (set L n c)
+(define (set ls)
+ (let ([L (list-ref ls 0)]
+        [n (list-ref ls 1)]
+        [c (list-ref ls 2)])
  (set! n (+ n 1))
   (let loop ((x 1)
              (em '()))
@@ -26,43 +28,43 @@
       [(= x n)
        (loop (add1 x) (cons c em))]
       [else
-       (loop (add1 x) (cons (list-ref L (sub1 x)) em))])))
+       (loop (add1 x) (cons (list-ref L (sub1 x)) em))]))))
 
 
-(define (merge ls1 ls2)
+
+(define (merge ls)
+  (let ([ls1 (list-ref ls 0)]
+        [ls2 (list-ref ls 1)])
   (match* (ls1 ls2)
     [((list) ls2)  ls2]
     [(as (list))  ls1]
     [((list a ls1 ...) (list b ls2 ...))
      (if (< a b)
          (cons a (merge ls1 (cons b ls2)))
-         (cons b (merge (cons a ls1) ls2)))]))
+         (cons b (merge (cons a ls1) ls2)))])))
 
-(define (merge_sort ls)
+
+(define (mergeSort ls)
   (match ls
     [(list)  ls]
     [(list a)  ls]
     [_  (define-values (lvs rvs)
           (split-at ls (quotient (length ls) 2)))
-        (merge (merge_sort lvs) (merge_sort rvs))]))
+        (merge (mergeSort lvs) (mergeSort rvs))]))
 
 
-(define (make_list a b) (
-                         cond
+(define (makeList ls) (let ([a (list-ref ls 0)]
+                             [b (list-ref ls 1)])
+                         (cond
                           [(or (zero? a) (< a 0)) '()]
-                          [else (make-list a b)]
-                         ))
+                          [else (makeList a b)]
+                         )))
 
-(define (reverse_all L) (cond
+(define (reverseAll L) (cond
                    [(null? L) '()]
-                   [else (append (reverse_all (cdr L)) (if (list? (car L)) (list (reverse_all (car L))) (list (car L))))]
+                   [else (append (reverseAll (cdr L)) (if (list? (car L)) (list (reverseAll (car L))) (list (car L))))]
                    ))
 
-(define (eval str)
-  (define lex-this (lambda (lexer input) (lambda () (lexer input))))
-  (define my-lexer (lex-this simple-math-lexer (open-input-string str)))
-  (with-handlers (
-                  [(lambda (v) (and (list? v) (equal? (first v) 'return))) (lambda (v) (list-ref v 1))])
-    (value-of-command (let ((parser-res (simple-math-parser my-lexer))) parser-res) (empty-env))
-  )
-)
+
+
+

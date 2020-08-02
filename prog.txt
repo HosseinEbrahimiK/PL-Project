@@ -1,3 +1,2 @@
-f = func(a, b){ return b };
-s = f(13/0, 12);
-return s
+a = mergeSort([1, 2, 5, 3, 4]);
+return a
