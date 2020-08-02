@@ -501,10 +501,10 @@
                      [(number? operand1) (if (zero? operand1) 0 (* operand1 (value-of-bexp exp2 env)))]
                      [(boolean? operand1) (if (false? operand1) #f (and operand1 (value-of-bexp exp2 env)))]
                      
-                     [(and (number? operand1) (list? (value-of-bexp exp2 env))) (operation (value-of-bexp exp2 env) operand1 *)]
-                     [(and (list? operand1) (number? (value-of-bexp exp2 env))) (operation operand1 (value-of-bexp exp2 env) *)]     
-                     [(and (boolean? operand1) (list? (value-of-bexp exp2 env))) (bool-mult (value-of-bexp exp2 env) operand1)]
-                     [(and (list? operand1) (boolean? (value-of-bexp exp2 env))) (bool-mult operand1 (value-of-bexp exp2 env))]
+                     [(and (number? operand1) (list? (value-of-bexp exp2 env))) (map (lambda (x) (* operand1 x)) (value-of-bexp exp2 env))]
+                     [(and (list? operand1) (number? (value-of-bexp exp2 env))) (map (lambda (x) (* (value-of-bexp exp2 env) x)) operand1)]     
+                     [(and (boolean? operand1) (list? (value-of-bexp exp2 env))) (map (lambda (x) (and operand1 x)) (value-of-bexp exp2 env))]
+                     [(and (list? operand1) (boolean? (value-of-bexp exp2 env))) (map (lambda (x) (and (value-of-bexp exp2 env) x)) operand1)]
                      
                      [else (raise "Invalid operand type for multiply operation.")])
                      ))
@@ -514,8 +514,8 @@
                        [operand2 (value-of-bexp exp2 env)])
                    (cond
                      [(and (number? operand1) (number? operand2)) (/ operand1 operand2)]
-                     [(and (number? operand1) (list? operand2)) (operation operand2 operand1 /)]
-                     [(and (list? operand1) (number? operand2)) (operation operand1 operand2 /)]
+                     [(and (number? operand1) (list? operand2)) (map (lambda (x) (/ operand1 x)) operand2)]
+                     [(and (list? operand1) (number? operand2)) (map (lambda (x) (/ x operand2)) operand1)]
                      [else (raise  "Invalid operand type for divide operation.")])
                      ))
                 )))
@@ -532,8 +532,8 @@
                        [operand2 (value-of-aexp exp2 env)])
                    (cond
                      [(and (number? operand1) (number? operand2)) (- operand1 operand2)]
-                     [(and (number? operand1) (list? operand2)) (operation operand2 operand1 -)]
-                     [(and (list? operand1) (number? operand2)) (operation operand1 operand2 -)]
+                     [(and (number? operand1) (list? operand2)) (map (lambda (x) (- operand1 x)) operand2)]
+                     [(and (list? operand1) (number? operand2)) (map (lambda (x) (- x operand2)) operand1)]
                      [else (raise "Invalid operand type for minus operation.")])
                      ))
 
@@ -542,18 +542,19 @@
                        [operand2 (value-of-aexp exp2 env)])
                    (cond
                      [(and (number? operand1) (number? operand2)) (+ operand1 operand2)]
-                     [(and (number? operand1) (list? operand2)) (operation operand2 operand1 +)]
-                     [(and (list? operand1) (number? operand2)) (operation operand1 operand2 +)]
+                     [(and (number? operand1) (list? operand2)) (map (lambda (x) (+ operand1 x)) operand2)]
+                     [(and (list? operand1) (number? operand2)) (map (lambda (x) (+ operand2 x)) operand1)]
                      [(and (boolean? operand1) (boolean? operand2)) (or operand1 operand2)]
-                     [(and (boolean? operand1) (list? operand2)) (bool-or operand2 operand1)]
-                     [(and (list? operand1) (boolean? operand2)) (bool-or operand1 operand2)]
+                     [(and (boolean? operand1) (list? operand2)) (map (lambda (x) (or operand1 x)) operand2)]
+                     [(and (list? operand1) (boolean? operand2)) (map (lambda (x) (or operand2 x)) operand1)]
                      [(and (string? operand1) (string? operand2)) (string-append operand1 operand2)]
-                     [(and (string? operand1) (list? operand2)) (str-app operand2 operand1)]
-                     [(and (list? operand1) (string? operand2)) (str-app operand1 operand2)]
+                     [(and (string? operand1) (list? operand2)) (map (lambda (x) (string-append operand1 x)) operand2)]
+                     [(and (list? operand1) (string? operand2)) (map (lambda (x) (string-append x operand2)) operand1)]
                      [(and (list? operand1) (list? operand2)) (append operand1 operand2)]
                      [else (raise "Invalid operand type for sum operation.")])
                      ))
        )))
+
 
 
 
