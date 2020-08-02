@@ -1,4 +1,4 @@
-a = [0, 0, 0, 0];
+a = 2;
 f = func(a){
     ff = func(b){
         return b + 1

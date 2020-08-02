@@ -137,6 +137,9 @@
   (a-thunk
    (expr exp?)
    (saved-env enviroment?))
+  (call-thunk
+   (cl call?)
+   (saved-env enviroment?))
   )
 
 
@@ -152,7 +155,8 @@
      (extend-env (saved-var saved-val saved-env)
                  (if (eqv? search-var saved-var)
                      (if (thunk? saved-val) (cases thunk saved-val
-                                              (a-thunk (expr saved-env) (value-of-exp expr saved-env))) saved-val) 
+                                              (a-thunk (expr saved-env) (value-of-exp expr saved-env))
+                                              (call-thunk (cl saved-env) (value-of-call cl saved-env))) saved-val) 
                      (apply-env saved-env search-var)))
      
      (extend-env-func (p-name func saved-env)
@@ -258,10 +262,7 @@
     (assign-cmd-func (var func)
                      (extend-env-func var func env))
     (assign-cmd-call (var cl)
-                     (begin
-                       (let ([res (value-of-call cl env)])
-                       (begin
-                         (extend-env var res env))))
+                     (extend-env var (call-thunk cl env) env)
                      )))
 )
 
