@@ -1,0 +1,5 @@
+b = true;
+c = false * true;
+c = false * false;
+c = false * 2;
+return c

@@ -1,0 +1,5 @@
+f = func(a){
+    return 0 * (a / 0)
+};
+b = f(2);
+return b

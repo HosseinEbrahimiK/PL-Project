@@ -1,0 +1,2 @@
+b = pow(2, 5);
+return b

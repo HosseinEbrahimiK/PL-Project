@@ -1,0 +1,9 @@
+a = "abcd";
+f = func(b){
+    a = a + "aaa";
+    return a;
+    return 222
+};
+a = "aaa";
+b = f(null);
+return b

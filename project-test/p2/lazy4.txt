@@ -1,0 +1,6 @@
+f = func(a, b, c){
+    return b + c
+};
+
+b = f(2/0, [1], [2]);
+return b

@@ -1,0 +1,4 @@
+a = [3, 1];
+b = [2, 4];
+b = merge_sort(b, a);
+return b

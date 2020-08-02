@@ -1,0 +1,5 @@
+f = func(a){
+    return a
+};
+b = f(2);
+return b

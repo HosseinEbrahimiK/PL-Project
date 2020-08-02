@@ -1,0 +1,6 @@
+f = [0, 0, 0, 0];
+f = func(a){
+    return f[1]
+};
+b = f(null);
+return b

@@ -1,0 +1,7 @@
+a = [true, false];
+f = func(b){
+    a = a + true;
+    return a
+};
+b = f(true);
+return b * false

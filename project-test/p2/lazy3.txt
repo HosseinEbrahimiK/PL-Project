@@ -1,0 +1,7 @@
+f = func(a){
+    while true do a = 4 end
+};
+
+b = 2 / 0 + 1 / 0 - 0;
+c = f(1);
+return 222

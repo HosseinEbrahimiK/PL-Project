@@ -1,0 +1,11 @@
+f = func(a){
+    if a == 0
+        then return 0 
+        else if a == 1
+            then return 1
+            else b = f(a-1); c = f(a-2); return b + c
+            endif
+        endif
+};
+b = f(6);
+return b

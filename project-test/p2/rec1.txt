@@ -1,0 +1,9 @@
+f = func(a, b){
+    if a == 0
+        then return [] 
+        else a = f(a - 1, b);
+        return a + [b]
+        endif
+};
+b = f(3, 5);
+return b
