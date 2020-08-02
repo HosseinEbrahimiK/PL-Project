@@ -1,8 +1,114 @@
 (require (lib "eopl.ss" "eopl"))
 (require racket/include)
 (include "parser.rkt")
-;(include "env_code.rkt")
 (require dyoo-while-loop)
+
+;;;;;; AAaalooo
+
+
+(define (pow l) (if (= (list-ref l 1) 0) 1
+                      (if (positive? (list-ref l 1))
+                      (* (list-ref l 0) (pow (list (list-ref l 0) (- (list-ref l 1) 1 ))))
+                      (/ 1 (list (pow (list-ref l 0) (- (list-ref l 1)))))
+                      )))
+
+(define (Reverse ls)
+  (let ([l (list-ref ls 0)])
+  (if (null? l)
+      '()
+      (reverse l)
+  )
+))
+
+(define (set ls)
+ (let ([L (list-ref ls 0)]
+        [n (list-ref ls 1)]
+        [c (list-ref ls 2)])
+ (set! n (+ n 1))
+  (let loop ((x 1)
+             (em '()))
+    (cond
+      [(> x (length L))
+       (reverse em)]
+      [(= x n)
+       (loop (add1 x) (cons c em))]
+      [else
+       (loop (add1 x) (cons (list-ref L (sub1 x)) em))]))))
+
+
+
+(define (merge ls)
+  (let ([ls1 (list-ref ls 0)]
+        [ls2 (list-ref ls 1)])
+  (match* (ls1 ls2)
+    [((list) ls2)  ls2]
+    [(as (list))  ls1]
+    [((list a ls1 ...) (list b ls2 ...))
+     (if (< a b)
+         (cons a (merge (list ls1 (cons b ls2))))
+         (cons b (merge (list (cons a ls1) ls2))))])))
+
+
+(define (mergeSort l)
+  (let ([ls (list-ref l 0)])
+  (merge_sort ls)))
+
+
+(define (merge_sort ls)
+  (match ls
+    [(list)  ls]
+    [(list a)  ls]
+    [_  (define-values (lvs rvs)
+          (split-at ls (quotient (length ls) 2)))
+        (merge2arg (merge_sort lvs) (merge_sort rvs))]))
+
+
+(define (merge2arg ls1 ls2)
+  (match* (ls1 ls2)
+    [((list) ls2)  ls2]
+    [(as (list))  ls1]
+    [((list a ls1 ...) (list b ls2 ...))
+     (if (< a b)
+         (cons a (merge2arg ls1 (cons b ls2)))
+         (cons b (merge2arg (cons a ls1) ls2)))]))
+
+
+(define (makeList ls) (let ([a (list-ref ls 0)]
+                             [b (list-ref ls 1)])
+                         (cond
+                          [(or (zero? a) (< a 0)) '()]
+                          [else (make-list a b)]
+                         )))
+
+(define (reverseAll ls)
+  (let ([Li (list-ref ls 0)])
+   (deep-reverse)))
+
+(define (deep-reverse l)
+  (if (list? l)
+      (reverse (map deep-reverse l))
+      l))
+
+(define (eval ls)
+  (let ([str (list-ref ls 0)])
+  (define lex-this (lambda (lexer input) (lambda () (lexer input))))
+  (define my-lexer (lex-this simple-math-lexer (open-input-string str)))
+  (with-handlers (
+                  [(lambda (v) (and (list? v) (equal? (first v) 'return))) (lambda (v) (list-ref v 1))])
+    (value-of-command (let ((parser-res (simple-math-parser my-lexer))) parser-res) (empty-env))
+  )
+))
+
+
+
+(define lib-name (list 'pow 'makeList 'reverse 'reverseAll 'merge 'mergeSort 'set 'eval))
+(define lib-proc (list pow makeList Reverse reverseAll merge mergeSort set eval))
+(define (exist? v) (index-of lib-name v))
+
+
+
+
+
 
 ;;;;; ENV IS HERE
 (define-datatype proc proc?
@@ -153,12 +259,8 @@
                      (extend-env-func var func env))
     (assign-cmd-call (var cl)
                      (begin
-                       ;(display "in cmd bitch\n")
                        (let ([res (value-of-call cl env)])
                        (begin
-                        ; (display "arrrr ")
-                         ;(display res)
-                         ;(display "\n")
                          (extend-env var res env))))
                      )))
 )
@@ -167,14 +269,25 @@
   (begin
     (cases call cl
   (call-func (proc-name arguments)
+             
+             (if (exist? proc-name)
+                   ((list-ref lib-proc (exist? proc-name)) (get-val-arg arguments env '()))
+                
              (let ([pr (apply-env env proc-name)])
                (cases proc pr
                  (procedure (var body saved-env)
                             (with-handlers (
                   [(lambda (v)  (list? v)) (lambda (v) (list-ref v 1))])
-    (value-of-command body (extend-arg arguments var saved-env env))
-  )
-                            )))))))
+    (value-of-command body (extend-arg arguments var saved-env env))))))
+                   )
+             ))))
+
+(define (get-val-arg arguments env l)
+  (cases args arguments
+    (single-arg (ar) (append l (list (value-of-exp ar env))))
+    (multi-arg (first-arg rest-arg)
+               (get-val-arg rest-arg env (append l (list (value-of-exp first-arg env))))
+                            )))
 
 (define (extend-arg ar va saved-env env)
   (cases args ar
@@ -382,15 +495,16 @@
       (bexp-cexp (expr) (value-of-cexp expr env))
 
       (bexp-mult (exp1 exp2)
-                 (let ([operand1 (value-of-cexp exp1 env)]
-                       [operand2 (value-of-bexp exp2 env)])
+                 (let ([operand1 (value-of-cexp exp1 env)])
                    (cond
-                     [(and (number? operand1) (number? operand2)) (* operand1 operand2)]
-                     [(and (number? operand1) (list? operand2)) (operation operand2 operand1 *)]
-                     [(and (list? operand1) (number? operand2)) (operation operand1 operand2 *)]
-                     [(and (boolean? operand1) (boolean? operand2)) (and operand1 operand2)]
-                     [(and (boolean? operand1) (list? operand2)) (bool-mult operand2 operand1)]
-                     [(and (list? operand1) (boolean? operand2)) (bool-mult operand1 operand2)]
+                     [(number? operand1) (if (zero? operand1) 0 (* operand1 (value-of-bexp exp2 env)))]
+                     [(boolean? operand1) (if (false? operand1) #f (and operand1 (value-of-bexp exp2 env)))]
+                     
+                     [(and (number? operand1) (list? (value-of-bexp exp2 env))) (operation (value-of-bexp exp2 env) operand1 *)]
+                     [(and (list? operand1) (number? (value-of-bexp exp2 env))) (operation operand1 (value-of-bexp exp2 env) *)]     
+                     [(and (boolean? operand1) (list? (value-of-bexp exp2 env))) (bool-mult (value-of-bexp exp2 env) operand1)]
+                     [(and (list? operand1) (boolean? (value-of-bexp exp2 env))) (bool-mult operand1 (value-of-bexp exp2 env))]
+                     
                      [else (raise "Invalid operand type for multiply operation.")])
                      ))
 

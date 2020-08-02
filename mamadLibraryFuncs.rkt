@@ -1,11 +1,12 @@
 #lang racket
-(define (pow a b) (if (= b 0) 1
-                      (if (positive? b)
-                      (* a (pow a (- b 1 )))
-                      (/ 1 (pow a (- b)))
-                      )))
-(pow 3 5)
+(require (lib "eopl.ss" "eopl"))
+(require racket/include)
 
+(define (pow l) (if (= (list-ref l 1) 0) 1
+                      (if (positive? (list-ref l 1))
+                      (* (list-ref l 0) (pow (list (list-ref l 0) (- (list-ref l 1) 1 ))))
+                      (/ 1 (list (pow (list-ref l 0) (- (list-ref l 1)))))
+                      )))
 
 (define (reverse l)
   (if (null? l)
@@ -14,9 +15,10 @@
   )
 )
 
-(reverse '(1 '(12 3) 3) )
-
-(define (set L n c)
+(define (set ls)
+ (let ([L (list-ref ls 0)]
+        [n (list-ref ls 1)]
+        [c (list-ref ls 2)])
  (set! n (+ n 1))
   (let loop ((x 1)
              (em '()))
@@ -26,26 +28,43 @@
       [(= x n)
        (loop (add1 x) (cons c em))]
       [else
-       (loop (add1 x) (cons (list-ref L (sub1 x)) em))])))
+       (loop (add1 x) (cons (list-ref L (sub1 x)) em))]))))
 
-(set '(a b c d e) 4 'd)
 
-(define (merge ls1 ls2)
+
+(define (merge ls)
+  (let ([ls1 (list-ref ls 0)]
+        [ls2 (list-ref ls 1)])
   (match* (ls1 ls2)
     [((list) ls2)  ls2]
     [(as (list))  ls1]
     [((list a ls1 ...) (list b ls2 ...))
      (if (< a b)
          (cons a (merge ls1 (cons b ls2)))
-         (cons b (merge (cons a ls1) ls2)))]))
+         (cons b (merge (cons a ls1) ls2)))])))
 
-(define (merge_sort ls)
+
+(define (mergeSort ls)
   (match ls
     [(list)  ls]
     [(list a)  ls]
     [_  (define-values (lvs rvs)
           (split-at ls (quotient (length ls) 2)))
-        (merge (merge_sort lvs) (merge_sort rvs))]))
+        (merge (mergeSort lvs) (mergeSort rvs))]))
 
-(merge '(1 4) '(3 5))
-(merge_sort '(1 4 2 8 3))
+
+(define (makeList ls) (let ([a (list-ref ls 0)]
+                             [b (list-ref ls 1)])
+                         (cond
+                          [(or (zero? a) (< a 0)) '()]
+                          [else (makeList a b)]
+                         )))
+
+(define (reverseAll L) (cond
+                   [(null? L) '()]
+                   [else (append (reverseAll (cdr L)) (if (list? (car L)) (list (reverseAll (car L))) (list (car L))))]
+                   ))
+
+
+
+
