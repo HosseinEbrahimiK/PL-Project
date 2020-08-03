@@ -1,2 +1,2 @@
-b = make_list(2, 5);
+b = makeList(2, 5);
 return b

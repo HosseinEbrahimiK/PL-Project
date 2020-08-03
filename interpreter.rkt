@@ -24,7 +24,7 @@
 
 
 
-(interperet "prog.txt")
+(interperet "project-test/bfs/bf8.txt")
 
 
 

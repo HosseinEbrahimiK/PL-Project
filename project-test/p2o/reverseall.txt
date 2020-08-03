@@ -1,2 +1,2 @@
-b = reverse_all([2, [2, 5]]);
+b = reverseAll([2, [2, 5]]);
 return b
